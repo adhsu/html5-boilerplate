@@ -15,6 +15,194 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+
+        <script src="http://d3js.org/d3.v2.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+
+        <script>
+
+            function getMaxObjectValue(this_array, element) {
+                var values = [];
+                for (var i = 0; i < this_array.length; i++) {
+                        values.push(Math.ceil(parseFloat(this_array[i][""+element])));
+                }
+                values.sort(function(a,b){return a-b});
+                return values[values.length-1];
+            }
+
+            function getMinObjectValue(this_array, element) {
+                var values = [];
+                for (var i = 0; i < this_array.length; i++) {
+                        values.push(Math.floor(parseFloat(this_array[i][""+element])));
+                }
+                values.sort(function(a,b){return a-b});
+                return values[0];
+            }
+
+            $(document).ready(function() {
+
+                var data = [];                                  
+                // this is our data array
+                var startingDate = new Date(2012, 8, 18);       
+                // this is a date object. each of our data objects is attached to a date
+                var weightArray = [155, 155, 160, 160, 165, 165, 165, 170, 170, 170];
+                for (var i = 0; i < 10; i++) {                  
+                // loop 10 times to create 10 data objects
+                    var tmpObj  = {};                           
+                        // this is a temporary data object
+
+                    tmpObj.date = new Date(startingDate.getFullYear(), startingDate.getMonth(), startingDate.getDate()+i);              
+                        // the data for this data object. Increment it from the starting date.
+                    tmpObj.DAU  = weightArray[i];              
+                        // random value. Round it to a whole number.
+                    data.push(tmpObj);                          
+                        // push the object into our data array
+                }
+
+                var width = 400, height = 300;
+                var margin = {top: 30, right: 40, bottom: 40, left: 60}, width = width - margin.left - margin.right, height = height - margin.top - margin.bottom;
+                // these are graph size settings
+
+                var minDate = (data[0].date),
+                maxDate = data[data.length-1].date;
+                minObjectValue = getMinObjectValue(data, 'DAU');
+                maxObjectValue = getMaxObjectValue(data, 'DAU');
+
+                //create the graph object
+                var vis= d3.select("#metrics").append("svg")
+                    .data(data)
+                    .attr("class", "metrics-container")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var y = d3.scale.linear().domain([ minObjectValue - (.03 * minObjectValue) , maxObjectValue + (.03 * maxObjectValue) ]).range([height, 0]),
+                x = d3.time.scale().domain([minDate, maxDate]).range([0, width]);
+
+                var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient("left")
+                    .ticks(5);
+
+                var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .orient("bottom")
+                    .ticks(5);
+
+                vis.append("g")
+                    .attr("class", "axis")
+                    .call(yAxis);
+
+                vis.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+
+                //add the axes labels
+                vis.append("text")
+                    .attr("class", "axis-label")
+                    .attr("text-anchor", "end")
+                    .attr("x", 190)
+                    .attr("y", height + 44)
+                    .text('Date');
+
+                vis.append("text")
+                    .attr("class", "axis-label")
+                    .attr("text-anchor", "end")
+                    .attr("y", 6)
+                    .attr("dy", "-3.4em")
+                    .attr("dx", "-5em")
+                    .attr("transform", "rotate(-90)")
+                    .text('Weight');
+
+                var line = d3.svg.line()
+                    .x(function(d) { return x(d["date"]); })
+                    .y(function(d) { return y(d["DAU"]); })
+
+                vis.append("svg:path")
+                    .attr("d", line(data))
+                    .style("stroke", function() { 
+                        return "#000000";
+                    })
+                    .style("fill", "none")
+                    .style("stroke-width", "2");
+
+                    var dataCirclesGroup = vis.append('svg:g');
+
+                    var circles = dataCirclesGroup.selectAll('.data-point')
+                        .data(data);
+
+                    circles
+                        .enter()
+                        .append('svg:circle')
+                        .attr('class', 'dot')
+                        .attr('fill', function() { return "#666"; })
+                        .attr('cx', function(d) { return x(d["date"]); })
+                        .attr('cy', function(d) { return y(d["DAU"]); })
+                        .attr('r', function() { return 3; })
+                        .on("mouseover", function(d) {
+                            d3.select(this)
+                                .attr("r", 8)
+                                .attr("class", "dot-selected")
+                                .transition()
+                                    .duration(750);
+                        })
+                        .on("mouseout", function(d) {
+                            d3.select(this)
+                                .attr("r", 3)
+                                .attr("class", "dot")
+                                .transition()
+                                    .duration(750);
+                        });
+
+            });
+
+            </script>
+
+            <style>
+            .axis path, .axis line {
+              fill: none;
+              stroke: #000;
+              shape-rendering: crispEdges;
+            }
+
+            .axis-label {
+                font-weight: bold;
+            }
+
+            .line {
+              fill: none;
+              stroke-width: 1.5px;
+
+            }
+
+            
+
+            .dot {
+
+              stroke-width: 1.5px;
+            }
+
+            .dot-selected {
+              fill: #B0C4DE;
+              stroke: #B0C4DE;
+              stroke-width: 1.5px;
+            }
+
+            .metrics-container {
+                width: auto;
+                height: auto;
+                padding: 10px 10px 10px 10px;
+                border: 0;
+                float: left;
+                margin-left: 0px;
+                margin-top: -20px;
+                margin-bottom: 40px;
+            }
+        </style>
+
     </head>
     <body>
         <!--[if lt IE 7]>
@@ -22,7 +210,272 @@
         <![endif]-->
 
         <!-- Add your site or application content here -->
-        <p>Hello world! This is HTML5 Boilerplate.</p>
+        <div class="wrapper">
+
+
+            <!-- ////// SIGNUP PAGE ///////
+            <h1>Welcome to Milo!</h1>
+            <form accept-charset="UTF-8" action="#" id="user_signup" method="post">
+
+                <label for="user_name">What's your name?</label>
+                <input class="signup_input" id="user_name" placeholder="e.g. Arnold Schwarzenegger" type="text" />
+
+                <label for="user_gender">Are you...</label>
+                <fieldset class="radio">
+                    <input id="male" name="gendertoggle" class="radio inline" value="false" type="radio" checked>
+                    <label for="male" class="radio inline">Male</label>
+                    <input id="female" name="gendertoggle" class="radio inline" value="false" type="radio">
+                    <label for="female" class="radio inline">Female</label>
+                </fieldset>
+                <label for="user_age">How old are you?</label>
+                <input class="signup_input" id="user_name" placeholder="e.g. 99" type="text" />
+
+                <label for="user_weight">How much do you weigh? (in lbs)</label>
+                <input class="signup_input" id="user_name" placeholder="e.g. 399" type="text" />
+                
+            </form>
+            <div class="botnav">
+                <div class="next">
+                    <a href="javascript:;">Next</a>
+                </div>
+            </div>
+            !-->
+
+            <!-- ////// Select Routine ///////
+            <h1>Select a Routine!</h1>
+
+            <button type="button" class="bigbtn">Cavefish Bodybuilding</button>
+            <button type="button" class="bigbtn">Beginner 5x5</button>
+            <button type="button" class="bigbtn disabled" disabled>Create (coming soon!)</button>
+            !-->
+
+            <!-- ////// Routine Details ///////
+            <h1>Cavefish Bodybuilding</h1>
+
+            This routine is from a bodybuilding forum for beginners. It's not easy but certainly not impossible to finish and your body will adapt after a few weeks. Another important thing to remember is that nothing is set in stone here so you don't have to follow it to the letter, its just a base/template for you to go off of. 
+ 
+            <p><b>MONDAY - Legs</b><br/>
+                4 sets leg extension 10-15reps (keep it light, this is just to get blood in the legs) <br/>
+                4 sets squat 6-10 reps <br/>
+                3 sets leg press 10-12 reps <br/>
+                4 sets leg curl 10-12 reps <br/>
+                3 sets stiff legged deadlift or walking lunges (hamstring or quad, pick one and alternate every so often or whichever you think needs more work)</p>
+
+            <p><b>TUESDAY - Chest</b><br/>
+                4 sets incline DB or barbell bench <br/>
+                8-12 reps 3 sets flat DB or barbell bench <br/>
+                8-12 reps 3 sets DB fly or machine fly (pec deck) <br/>
+                12-15 reps, focus on squeezing at the top 2 sets weighted dips
+            </p>
+
+            <p><b>WED - OFF</b></p>
+
+            <p><b>THURSDAY - back</b><br/>
+            4 sets bodyweight pullups: up to 15 reps (add weight if 4x15 is too easy)  <br/>
+            4 sets bent over row barbell or DB row 8-12 reps <br/>
+            3 sets front pulldown, wide or narrow (switch it up) 8-10 reps <br/>
+            3 sets cable row 6-10 reps <br/>
+            Behind the head pulldowns(yeah they're bad blah blah blah): 2 sets 15 reps Medium easy weight...just squeeze.</p>
+
+            <p><b>FRIDAY- shoulders/arms</b><br/>
+                3 sets DB press or front military 8-10 reps <br/>
+                3 sets side laterals 10-12 reps <br/>
+                3 sets rear lateral machine or DB 10-12 reps <br/>
+                6 sets shrugs behind the back for 3 sets and to the front for 3</p>
+
+            <p>Triceps <br/>
+                3 sets 10-15 rope pushdown <br/>
+                3 sets skullcrushers or DB extensions 6-10 reps <br/>
+                3 sets reversed push down (palms facing) 8-10 reps</p>
+
+            <p>Biceps <br/>
+                3 sets barbell curl or e-z curl bar 8-12 reps <br/>
+                3 sets preacher machine or db/barbell 8-12 reps <br/>
+                2 sets hammer curl db or rope 10-15 reps <br/>
+                wrist curls 13-20 reps 2 sets </p>
+
+            <div class="botnav">
+                <div class="back">
+                    <a href="javascript:;">Back</a>
+                </div>
+
+                <div class="next">
+                    <a href="javascript:;">Next</a>
+                </div>
+            </div>
+
+            !-->
+            
+            <!-- ////// Home ///////
+            <h1>Work out with Milo!</h1>
+
+            <h2>Recommended For Today</h2>
+            <button type="button" class="bigbtn rec done">Incline BB Bench</button>
+            <button type="button" class="bigbtn rec done">Flat BB Bench</button>
+            <button type="button" class="bigbtn rec">DB Fly</button>
+            <button type="button" class="bigbtn rec">Weighted Dips</button>
+
+            <h2>Legs</h2>
+            <button type="button" class="bigbtn inactive">Leg Extension</button>
+            <button type="button" class="bigbtn inactive">Leg Curl</button>
+            <button type="button" class="bigbtn inactive">BB Deadlift</button>
+            <button type="button" class="bigbtn inactive">Stiff-Legged Deadlift</button>
+            <button type="button" class="bigbtn inactive">BB Back Squat</button>
+            <button type="button" class="bigbtn inactive">Walking Lunges</button>
+
+            <h2>Chest</h2>
+            It's chest day...
+
+            <h2>Back</h2>
+            <button type="button" class="bigbtn inactive">Pullups</button>
+            <button type="button" class="bigbtn inactive">DB Bent Over Row</button>
+            <button type="button" class="bigbtn inactive">BB Bent Over Row</button>
+            
+            <h2>Shoulders</h2>
+            <button type="button" class="bigbtn inactive">BB Overhead Press</button>
+            <button type="button" class="bigbtn inactive">DB Side Lateral</button>
+            <button type="button" class="bigbtn inactive">DB Rear Lateral</button>
+            <button type="button" class="bigbtn inactive">BB Shrugs Behind the Back</button>
+
+            
+            <h2>Arms</h2>
+            <button type="button" class="bigbtn inactive">BB/EZ Bar Curls</button>
+            <button type="button" class="bigbtn inactive">Preacher Curls</button>
+            <button type="button" class="bigbtn inactive">DB Hammer Curls</button>
+            <button type="button" class="bigbtn inactive">BB Wrist Curls</button>
+
+            <h2>Other</h2>
+
+            <div class="botnav">
+                <div class="middle"><a href="javascript:;">Lifting History</a></div>
+            </div>
+            !-->
+
+            <!-- ////// Exercise Details ///////
+
+            <h1>Incline BB Bench</h1>
+            <p class="exercise_description">
+                The incline angle of this press hits the upper pecs really hard.<br/><br/>
+                Main Muscle: Chest <br/>
+                Other: Shoulders, Triceps
+            </p>
+
+            <span class="recommended">Recommended (up 5 lbs from last time!):</span>
+
+            <form accept-charset="UTF-8" action="#" id="weight" method="post">
+
+                <input class="input_big" id="weight" placeholder="165" type="text" maxlength="3" />
+                <label for="weight" class="inline weight">lbs</label>
+            </form>
+
+            <button type="button" class="bigbtn bigger">Start!</button>
+            !-->
+
+
+            <!-- ////// Home ///////
+            
+
+            <h1>Ok, now do some Incline BB Bench.</h1>
+
+            <p class="repCount">You've done 2 x 8 reps @ 165 lbs.</p>
+
+            <form accept-charset="UTF-8" action="#" id="weight" method="post">
+
+                <input class="input_big short" id="weight" placeholder="8" type="text" maxlength="2" />
+                <label for="weight" class="inline weight">reps<a href="javascript:;" class="plus">+</a></label>
+            </form>
+
+
+
+            <div class="botnav">
+                <div class="back setsRemaining">
+                    1 set remaining!
+                </div>
+
+                <div class="next">
+                    <a href="javascript:;">Next</a>
+                </div>
+            </div>
+            !-->
+
+            <!-- ////// Log ///////
+
+            <h1>Incline BB Bench</h1>
+
+            <table class="history">
+                <tr class="active">
+                    <td><b>Wed 06/06</b></td>
+                    <td>3 x 8 @ 170 lbs</td>
+
+                </tr>
+
+                <tr>
+                    <td><b>Tue 06/05</b></td>
+                    <td>3 x 8 @ 165 lbs</td>
+
+                </tr>
+
+                <tr>
+                    <td><b>Mon 06/04</b></td>
+                    <td>3 x 8 @ 165 lbs</td>
+
+                </tr>
+
+
+            </table>
+
+            <div class="botnav">
+                <div class="next">
+                    <a href="javascript:;">Next</a>
+                </div>
+            </div>
+            !-->
+
+
+            <h1>History</h1>
+            <div id="metrics"></div>
+
+            <div class="clearfix"></div>
+            <div class="historytype">
+                <span class="active">By Exercise</span><span class>By Date</span>
+            </div>
+            <h2>Legs</h2>
+            <button type="button" class="bigbtn">Leg Extension</button>
+            <button type="button" class="bigbtn">Leg Curl</button>
+            <button type="button" class="bigbtn">BB Deadlift</button>
+            <button type="button" class="bigbtn">Stiff-Legged Deadlift</button>
+            <button type="button" class="bigbtn">BB Back Squat</button>
+            <button type="button" class="bigbtn">Walking Lunges</button>
+
+            <h2>Chest</h2>
+            <button type="button" class="bigbtn">Incline BB Bench</button>
+            <button type="button" class="bigbtn">Flat BB Bench</button>
+            <button type="button" class="bigbtn">DB Fly</button>
+            <button type="button" class="bigbtn">Weighted Dips</button>
+            <h2>Back</h2>
+            <button type="button" class="bigbtn">Pullups</button>
+            <button type="button" class="bigbtn">DB Bent Over Row</button>
+            <button type="button" class="bigbtn">BB Bent Over Row</button>
+
+            <h2>Shoulders</h2>
+            <button type="button" class="bigbtn">BB Overhead Press</button>
+            <button type="button" class="bigbtn">DB Side Lateral</button>
+            <button type="button" class="bigbtn">DB Rear Lateral</button>
+            <button type="button" class="bigbtn">BB Shrugs Behind the Back</button>
+
+
+            <h2>Arms</h2>
+            <button type="button" class="bigbtn">BB/EZ Bar Curls</button>
+            <button type="button" class="bigbtn">Preacher Curls</button>
+            <button type="button" class="bigbtn">DB Hammer Curls</button>
+            <button type="button" class="bigbtn">BB Wrist Curls</button>
+
+            <h2>Other</h2>
+
+        </div>
+
+
+
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>

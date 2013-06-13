@@ -94,19 +94,227 @@ textarea {
    ========================================================================== */
 
 
+.wrapper {
+    width: 610px;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    padding: 10px;
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+    padding-bottom: 30px;
+}
+
+h2 {
+    margin: 0;
+    padding: 0;
+    padding-bottom: 10px;
+    padding-top: 15px;
+    font-size: 1em;
+    color: #666;
+}
+
+form {
+    display: block;
+}
+
+label {
+    font-size: 0.9em;
+    display: block;
+}
+
+label.active {
+    color: #00a2ff;
+}
+
+input.signup_input {
+    clear: both;
+    display: block;
+    border: 0;
+    outline: none;
+    width: 80%;
+    padding-top: 10px;
+    padding-bottom: 25px;
+}
+
+input.input_big {
+    font-size: 3em;
+    border: 0;
+    outline: none;
+    display: inline;
+    width: 15%;
+}
+
+input.short {
+    width: 10%;
+}
+label.weight {
+    font-size: 2em;
+}
+
+fieldset.radio {
+    padding-top: 10px;
+    padding-bottom: 25px;
+}
+label.radio {
+    padding-right: 15px;
+}
+
+input.inline, label.inline {
+    display: inline;
+}
+
+span.recommended {
+    font-size: 0.9em;
+}
+
+.botnav {
+    position: fixed;
+    z-index: 100; 
+    bottom: 0; 
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #ccc;
+}
+
+.botnav .next {
+    float: right;
+    width: 60px;
+    height: 100%;
+    padding-top: 15px;
+    text-transform: uppercase;
+    font-size: 0.8em;
+}
+
+.botnav .back {
+    float: left;
+    width: 160px;
+    height: 100%;
+    padding-top: 15px;
+    padding-left: 15px;
+    text-transform: uppercase;
+    font-size: 0.8em;
+}
+
+.botnav .setsRemaining {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.botnav .middle {
+    padding-top: 15px;
+    width: 100px;
+    margin: 0 auto;
+}
+
+button.bigbtn {
+    
+    padding-top: 5px;
+    margin-bottom: 15px;
+    height: 35px;
+    width: 300px;
+    display: block;
+    
+    font-size: 1.2em;
+    color: white;
+    letter-spacing: 0.05em;
+    background: #29aebc;
+    
+    -moz-box-shadow: 0px 3px 0px #23848f;
+    -webkit-box-shadow: 0px 3px 0px #23848f;
+    box-shadow: 0px 3px 0px #23848f;
+
+    border: 0;
+    border-radius: 6px;
+}
+
+button.disabled {
+    color: #bdbab5;
+    background: #d9d9d2;
+    box-shadow: 0px 2px 0px #bdbab5;
+}
+
+button.rec {
+    background: #65bfbe;
+    box-shadow: inset 0px -2px 0px #42a6a5;
+
+}
+button.done {
+    background: #8cbf60;
+    box-shadow: 0px 2px 0px #68a851;
+    color: #538641;
+}
+
+button.inactive {
+    color: #928470;
+    background: #d9d9d2;
+    box-shadow: 0px 2px 0px #bdbab5;
+}
+
+button.bigger {
+    height: 80px;
+    font-size: 2em;
+    margin-top: 30px;
+}
+
+p.exercise_description {
+    border-left: 4px solid #666;
+    padding: 0;
+    padding-left: 8px;
+    margin-top: 0;
+    margin-bottom: 25px;
+
+}
+
+a.plus {
+    border-radius: 50%;
+    border: 3px solid #666;
+    width: 17px;
+
+    display: inline-block;
+    text-align: center;
+
+    text-decoration: none;
+    color: #333;
+    line-height: 0.9em;
+    font-size: 0.6em;
+    vertical-align: middle;
+    margin-left: 10px;
+}
 
 
+table.history {
+    width: 95%;
+}
 
+tr {
+    height: 40px;
+}
 
+tr.active {
+    background: #8cbf60;
+}
 
+td {
+    padding-left: 10px;
+}
 
+div.historytype {
+    margin: 0;
+    margin-bottom: 15px;
 
-
-
-
-
-
-
+}
+div.historytype span {
+    padding: 5px 10px;
+    margin-right: 15px;
+}
+div.historytype span.active {
+    border-radius: 14px;
+    background: #ccc;
+}
 
 
 /* ==========================================================================
